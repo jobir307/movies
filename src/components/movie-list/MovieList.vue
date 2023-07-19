@@ -1,16 +1,25 @@
 <template>
     <ul class="movie-list list-group">
-        <movie-list-item />
-        <movie-list-item />
-        <movie-list-item />
-        <movie-list-item />
+        <movie-list-item 
+          v-for="movie in movies" 
+          :key="movie.id" 
+          :movie="movie"
+          v-on:onToggle="$emit('onToggle', $event)" 
+          v-on:onDelete="$emit('deleteCurrentMovie', movie.id)"
+        />
     </ul>
 </template>
 
 <script>
 import MovieListItem from '../movie-list-item/MovieListItem.vue'
 export default {
-  components: { MovieListItem },        
+  components: { MovieListItem },
+  props: {
+    movies: {
+        type: Array,
+        required: true
+    }
+  }
 }
 </script>
 

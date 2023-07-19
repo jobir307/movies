@@ -1,10 +1,18 @@
 <template>
-    <input type="text" class="form-control search-input" autocomplete="off" placeholder="Kinolarni qidirish">
+    <input 
+        type="text" 
+        class="form-control search-input" 
+        autocomplete="off" 
+        placeholder="Kinolarni qidirish"
+    >
 </template>
 
 <script>
     export default {
-        
+        data() {
+            return {
+            }
+        }
     }
 </script>
 

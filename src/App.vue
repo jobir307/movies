@@ -1,13 +1,22 @@
 <template>
   <div class="app font-monospace">
     <div class="content">
-      <app-info />
+      <app-info 
+        v-bind:allMoviesCount="movies.length"
+        v-bind:favouriteMoviesCount="movies.filter(m => m.favourite).length"
+      />
       <div class="search-panel">
         <search-panel />
         <app-filter />
       </div>
-      <movie-list />
-      <movie-add-form />
+      <movie-list 
+        v-bind:movies="movies"
+        v-on:onToggle="onToggleMovie"
+        v-on:deleteCurrentMovie="deleteMovie"
+      />
+      <movie-add-form
+        v-on:createMovie="createNewMovie"
+       />
     </div>
   </div>
 </template>
@@ -29,11 +38,39 @@ export default {
   },
   data() {
     return {
-      
+        movies: [
+            {id: 1, name: 'Omar', viewers: 300, favourite: false, like: true},
+            {id: 2, name: 'Empire of osman', viewers: 754, favourite: true, like: false},
+            {id: 3, name: 'Ertugrul', viewers: 411, favourite: true, like: true}
+        ],
+        term: '',
     }
   },
   methods: {
-
+    createNewMovie(movie) {
+      this.movies.push(movie)
+    },
+    onToggleMovie({id, prop}) {
+      this.movies.map(item => {
+        if (item.id == id) {
+          if (prop == 'like') {
+            item.like = !item.like
+          } else if (prop == 'favourite') {
+            item.favourite = !item.favourite
+          }
+        }
+        return item
+      })
+    },
+    deleteMovie(movieId) {
+      const index = this.movies.findIndex(item => item.id === movieId)
+      this.movies.splice(index, 1)
+    },
+    onFilterMovie(arr, term) {
+      if (term.length == 0)
+        return arr
+      return arr.filter(c => c.name.toLowerCase().indexOf(term.toLowerCase()) > -1)
+    }
   }
 }
 </script>
