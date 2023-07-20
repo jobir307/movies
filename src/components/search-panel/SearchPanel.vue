@@ -1,16 +1,31 @@
 <template>
-    <input 
+    <my-input 
         type="text" 
-        class="form-control search-input" 
+        class="search-input" 
         autocomplete="off" 
         placeholder="Kinolarni qidirish"
-    >
+        v-bind:value="term"
+        v-on:input="changeTerm"
+    />
 </template>
 
 <script>
     export default {
+        props: {
+            updateTermHandler: {
+                type: Function,
+                required: true
+            }
+        },
         data() {
             return {
+                term: ''
+            }
+        },
+        methods: {
+            changeTerm(event) {
+                this.term = event.target.value
+                this.updateTermHandler(this.term)
             }
         }
     }
@@ -18,10 +33,7 @@
 
 <style scoped>
 .search-input {
-    padding: 1.2rem;
-    background-color: #fcfaf5;
-    border-radius: 4px;
-    box-shadow: 15px 15px 15px rgba(0, 0, 0, 0.15);
+    padding: 0.8rem;
     font-size: 20px;
 }
 </style>

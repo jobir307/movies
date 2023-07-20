@@ -7,43 +7,43 @@
             <span v-on:click="$emit('onToggle', {id: movie.id, prop: 'like'})" class="list-group-item-label">{{ movie.name }}</span>
             <input type="number" class="list-group-item-input" :value='movie.viewers' />
             <div class="d-flex justify-content-center align-items-center">
-                <button 
+                <my-button 
                     type="button" 
                     class="btn-cookie btn-sm" 
                     v-on:click="$emit('onToggle', {id: movie.id, prop: 'favourite'})"
                 >
                     <i class="fa fa-cookie"></i>
-                </button>
+                </my-button>
 
-                <button 
+                <my-button 
                     type="button" 
                     class="btn-trash btn-sm"
                     v-on:click="onDelete"
                 >
                     <i class="fa fa-trash"></i>
-                </button>
+                </my-button>
 
                 <i class="fa fa-star"></i>
             </div>
-
         </li>
     </div>
 </template>
 
 <script>
-    export default {
-        props: {
-            movie: {
-                type: Object,
-                required: true
-            }
-        },
-        methods: {
-            onDelete() {
-                this.$emit('onDelete', this.movie.id)
-            }
+
+export default {
+    props: {
+        movie: {
+            type: Object,
+            required: true
+        }
+    },
+    methods: {
+        onDelete() {
+            this.$emit('onDelete', this.movie.id)
         }
     }
+}
 </script>
 
 <style scoped>

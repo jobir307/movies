@@ -6,11 +6,16 @@
         v-bind:favouriteMoviesCount="movies.filter(m => m.favourite).length"
       />
       <div class="search-panel">
-        <search-panel />
-        <app-filter />
+        <search-panel 
+          v-bind:updateTermHandler="updateTermHandler"
+        />
+        <app-filter 
+          v-bind:updateFilterHandler="updateFilterHandler"
+          v-bind:filterName="filter"
+        />
       </div>
       <movie-list 
-        v-bind:movies="movies"
+        v-bind:movies="onFilter(onSearchHandler(movies, term), filter)"
         v-on:onToggle="onToggleMovie"
         v-on:deleteCurrentMovie="deleteMovie"
       />
@@ -25,8 +30,9 @@
 import AppInfo from '@/components/app-info/AppInfo.vue'
 import SearchPanel from '@/components/search-panel/SearchPanel.vue'
 import AppFilter from '@/components/app-filter/AppFilter.vue'
-import MovieList from './components/movie-list/MovieList.vue'
-import MovieAddForm from './components/movie-add-form/MovieAddForm.vue'
+import MovieList from '@/components/movie-list/MovieList.vue'
+import MovieAddForm from '@/components/movie-add-form/MovieAddForm.vue'
+import axios from 'axios'
 
 export default {
   components: { 
@@ -41,9 +47,11 @@ export default {
         movies: [
             {id: 1, name: 'Omar', viewers: 300, favourite: false, like: true},
             {id: 2, name: 'Empire of osman', viewers: 754, favourite: true, like: false},
-            {id: 3, name: 'Ertugrul', viewers: 411, favourite: true, like: true}
+            {id: 3, name: 'Ertugrul', viewers: 211, favourite: true, like: true},
+            {id: 4, name: 'Terminator', viewers: 4458, favourite: true, like: false}
         ],
         term: '',
+        filter: 'all'
     }
   },
   methods: {
@@ -66,11 +74,42 @@ export default {
       const index = this.movies.findIndex(item => item.id === movieId)
       this.movies.splice(index, 1)
     },
-    onFilterMovie(arr, term) {
+    onSearchHandler(arr, term) {
       if (term.length == 0)
         return arr
       return arr.filter(c => c.name.toLowerCase().indexOf(term.toLowerCase()) > -1)
+    },
+    onFilter(arr, filter) {
+      switch(filter) {
+        case "popular":
+          return arr.filter(c => c.like)
+        case "mostViewers":
+          return arr.filter(c => c.viewers > 400)
+        default:
+          return arr
+      }
+    },  
+    updateTermHandler(term) {
+      this.term = term
+    },
+    updateFilterHandler(filter) {
+      this.filter = filter
+    },
+    async fetchMovie() {
+      try {
+        let response = await axios.get('https://jsonplaceholder.typicode.com/osts?_limit=10')
+        response => response.json()
+        console.log(response);
+      } catch (error) {
+        console.log(error.message);
+      }
     }
+  },
+  mounted() {
+    this.fetchMovie()
+  },
+  updated() {
+    this.updatedLog()
   }
 }
 </script>
