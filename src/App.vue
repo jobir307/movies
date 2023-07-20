@@ -44,12 +44,7 @@ export default {
   },
   data() {
     return {
-        movies: [
-            {id: 1, name: 'Omar', viewers: 300, favourite: false, like: true},
-            {id: 2, name: 'Empire of osman', viewers: 754, favourite: true, like: false},
-            {id: 3, name: 'Ertugrul', viewers: 211, favourite: true, like: true},
-            {id: 4, name: 'Terminator', viewers: 4458, favourite: true, like: false}
-        ],
+        movies: [],
         term: '',
         filter: 'all'
     }
@@ -97,9 +92,16 @@ export default {
     },
     async fetchMovie() {
       try {
-        let response = await axios.get('https://jsonplaceholder.typicode.com/osts?_limit=10')
-        response => response.json()
-        console.log(response);
+        let {data} = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10')
+        const newArr = data.map(item => ({
+          id: item.id,
+          name: item.title,
+          viewers: item.id * 10, 
+          favourite: false, 
+          like: false
+        }))
+        console.log(newArr);
+        this.movies.push(newArr)
       } catch (error) {
         console.log(error.message);
       }
@@ -107,9 +109,6 @@ export default {
   },
   mounted() {
     this.fetchMovie()
-  },
-  updated() {
-    this.updatedLog()
   }
 }
 </script>
