@@ -14,11 +14,29 @@
           v-bind:filterName="filter"
         />
       </div>
-      <movie-list 
+      <my-loader v-if="loading && !movies.length"/>
+      <my-box v-else-if="!movies.length && !loading">
+        <p class="text-center fs-3 text-danger fw-bolder">Kino mavjud emas!</p>
+      </my-box>
+      <movie-list
+        v-else
         v-bind:movies="onFilter(onSearchHandler(movies, term), filter)"
         v-on:onToggle="onToggleMovie"
         v-on:deleteCurrentMovie="deleteMovie"
       />
+      <nav aria-label="pagination" class="mt-3">
+        <ul class="pagination justify-content-center">
+          <li 
+            v-for="pageNumber in totalPages" 
+            :key="pageNumber" 
+            class="page-item" 
+            :class="{ 'active': pageNumber == page }"
+            @click="changePageHandler(pageNumber)"
+          >
+            <span class="page-link">{{ pageNumber }}</span>
+          </li>
+        </ul>
+      </nav>
       <movie-add-form
         v-on:createMovie="createNewMovie"
        />
@@ -46,12 +64,22 @@ export default {
     return {
         movies: [],
         term: '',
-        filter: 'all'
+        filter: 'all',
+        loading: false,
+        limit: 10,
+        page: 1,
+        totalPages: 0
     }
   },
   methods: {
-    createNewMovie(movie) {
-      this.movies.push(movie)
+    async createNewMovie(movie) {
+      try {
+        const response = await axios.post('https://jsonplaceholder.typicode.com/posts', movie)
+        this.movies.push(response.data)
+      } catch (error) {
+        console.log(error)
+      } 
+      // this.movies.push(movie)
     },
     onToggleMovie({id, prop}) {
       this.movies.map(item => {
@@ -65,9 +93,15 @@ export default {
         return item
       })
     },
-    deleteMovie(movieId) {
-      const index = this.movies.findIndex(item => item.id === movieId)
-      this.movies.splice(index, 1)
+    async deleteMovie(movieId) {
+      try {
+        const response = await axios.delete(`https://jsonplaceholder.typicode.com/posts/${movieId}`)
+        console.log(response);
+        // const index = this.movies.findIndex(item => item.id === movieId)
+        // this.movies.splice(index, 1)
+      } catch (error) {
+        console.log(error);
+      }
     },
     onSearchHandler(arr, term) {
       if (term.length == 0)
@@ -90,25 +124,46 @@ export default {
     updateFilterHandler(filter) {
       this.filter = filter
     },
-    async fetchMovie() {
+    async fetchMovies() {
       try {
-        let {data} = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10')
-        const newArr = data.map(item => ({
-          id: item.id,
-          name: item.title,
-          viewers: item.id * 10, 
-          favourite: false, 
-          like: false
-        }))
-        console.log(newArr);
-        this.movies.push(newArr)
+        this.loading = true
+        setTimeout(async () => {
+          let response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
+            params: {
+              _limit: this.limit,
+              _page: this.page
+            }
+          })
+          const newArr = response.data.map(item => ({
+            id: item.id,
+            name: item.title,
+            viewers: item.id * 10, 
+            favourite: false, 
+            like: false
+          }))
+          this.movies = newArr
+          this.loading = false
+          this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit)
+        }, 1000);
+        
       } catch (error) {
         console.log(error.message);
       }
+    },
+    changePageHandler(pageNumber) {
+      this.page = pageNumber
     }
   },
   mounted() {
-    this.fetchMovie()
+    this.fetchMovies()
+  },
+  watch: { // watch - bu razvedchik ya'ni data (page) o'zgarsa reaksiya beradi !!!
+    page() {
+      this.fetchMovies()
+    },
+    movies() {
+      this.fetchMovies()
+    }
   }
 }
 </script>

@@ -12,6 +12,7 @@
 
 <style scoped>
     .box {
+        margin-top: 1.5rem;
         padding: 1.5rem;
         border-radius: 4px;
         background-color: #fcfaf5;
